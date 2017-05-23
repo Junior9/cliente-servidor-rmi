@@ -2,7 +2,8 @@ package com.rmi.cliente;
 
 import java.rmi.ConnectException;
 import java.rmi.Naming;
-import com.rmi.servidor.Servidor;
+import java.rmi.Remote;
+import com.rmi.servidor.ServidorRemote; 
 
 public class Cliente {
   
@@ -11,28 +12,28 @@ public class Cliente {
    * utilizar para fazer
    * referencia ao objeto remoto que será implementado
    */
-  private static Servidor server;
+  private static ServidorRemote serverRmi;
   private static final String PORT = "1099";
   private static final String IP = "localhost";
 
   public static void main(String[] args) {
     
-    // ip da máquina do servidor: 127.0.0.1
-    String ipConfig = "//"+IP +":"+ PORT+"/";
     String retorno = null;
 
     try {
-      /* - o lookup carrega o Servidor_Stub do CLASSPATH 127.0.0.1 - é o IP da máquina de onde o servidor está
-       * rodando.
+      System.setProperty("java.security.policy","policy");
+      
+      /* lookup carrega o Servidor_Stub do CLASSPATH 127.0.0.1 - é o IP da máquina de onde o servidor está  rodando.
        * "Mensagem" é o nome que utilizamos para fazer referencia ao objeto no servidor.
        */
       // aqui instanciamos o objeto remoto
-      //server = (Servidor) Naming.lookup(ipConfig +"servidorRmi");
-      server = (Servidor) Naming.lookup("//" + IP + ":1099/servidorRmi");
-      
+      Remote reference =  Naming.lookup("//"+IP+":"+PORT+"/servidorRmi");
+      serverRmi = (ServidorRemote) reference;
+     
       // agora executamos o metodo "mostraMensagem" no
       // objeto remoto
-      retorno = server.getMsg();
+      retorno = serverRmi.getMsg();
+      
       System.out.println(retorno);
       } catch (ConnectException e) {
       System.out.println("ERRO:Servidor Desconectado: " + e.getMessage());
@@ -40,6 +41,4 @@ public class Cliente {
       System.out.println("Erro Interno: " + e.getMessage());
       }
   }
-  
-  
 }
